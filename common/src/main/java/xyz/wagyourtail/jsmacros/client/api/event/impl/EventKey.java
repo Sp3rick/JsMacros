@@ -31,15 +31,15 @@ public class EventKey implements BaseEvent {
     
     public EventKey(int key, int scancode, int action, int mods) {
         
-        InputUtil.Key keycode;
+        InputUtil.KeyCode keycode;
         if (key <= 7) keycode = InputUtil.Type.MOUSE.createFromCode(key);
         else keycode = InputUtil.Type.KEYSYM.createFromCode(key);
         
         this.action = action;
-        this.key = keycode.getTranslationKey();
+        this.key = keycode.getName();
         this.mods = getKeyModifiers(mods);
         
-        if (keycode == InputUtil.UNKNOWN_KEY) return;
+        if (keycode == InputUtil.UNKNOWN_KEYCODE) return;
 
         if (action == 1) FKeyBind.KeyTracker.press(keycode);
         else FKeyBind.KeyTracker.unpress(keycode);
