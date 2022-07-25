@@ -1,13 +1,9 @@
 package xyz.wagyourtail.jsmacros.client.mixins.access;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Text;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.util.IChatComponent;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,6 +25,7 @@ import xyz.wagyourtail.jsmacros.client.api.sharedclasses.PositionCommon.Pos2D;
 import xyz.wagyourtail.jsmacros.client.api.sharedclasses.RenderCommon;
 import xyz.wagyourtail.jsmacros.client.api.sharedinterfaces.IDraw2D;
 import xyz.wagyourtail.jsmacros.client.api.sharedinterfaces.IScreen;
+import xyz.wagyourtail.jsmacros.client.gui.elements.Drawable;
 import xyz.wagyourtail.jsmacros.core.Core;
 import xyz.wagyourtail.jsmacros.core.MethodWrapper;
 import xyz.wagyourtail.jsmacros.client.access.CustomClickEvent;
@@ -39,8 +36,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-@Mixin(Screen.class)
-public abstract class MixinScreen extends DrawableHelper implements IScreen, IMouseScrolled {
+@Mixin(GuiScreen.class)
+public abstract class MixinScreen extends Gui implements IScreen, IMouseScrolled {
     @Unique
     private final Set<RenderCommon.RenderElement> elements = new LinkedHashSet<>();
     @Unique
@@ -61,22 +58,22 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
     private MethodWrapper<IScreen, Object, Object, ?> onClose;
 
     @Unique
-    private Map<ButtonWidget, Consumer<ButtonWidget>> customButtons = new HashMap<>();
+    private Map<GuiButton, Consumer<GuiButton>> customButtons = new HashMap<>();
     @Unique
-    private Set<TextFieldWidget> customTextFields = new HashSet<>();
+    private Set<GuiTextField> customTextFields = new HashSet<>();
 
     @Shadow
     public int width;
     @Shadow
     public int height;
     @Shadow
-    protected MinecraftClient client;
+    protected Minecraft client;
     @Shadow
-    protected TextRenderer textRenderer;
+    protected FontRenderer textRenderer;
     @Shadow
-    protected List<ButtonWidget> buttons;
+    protected List<GuiButton> buttons;
     @Shadow
-    private ButtonWidget prevClickedButton;
+    private GuiButton prevClickedButton;
 
     @Shadow
     public abstract void removed();
@@ -101,7 +98,7 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
 
 
     @Shadow
-    protected abstract void buttonClicked(ButtonWidget button) throws IOException;
+    protected abstract void buttonClicked(GuiButton button) throws IOException;
 
     @Override
     public int getWidth() {
@@ -159,18 +156,18 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
 
     @Override
     public List<TextFieldWidgetHelper> getTextFields() {
-        Map<TextFieldWidget, TextFieldWidgetHelper> btns = new LinkedHashMap<>();
+        Map<GuiTextField, TextFieldWidgetHelper> btns = new LinkedHashMap<>();
         for (RenderCommon.RenderElement el : elements) {
             if (el instanceof TextFieldWidgetHelper) {
                 btns.put(((TextFieldWidgetHelper) el).getRaw(), (TextFieldWidgetHelper) el);
             }
         }
         Arrays.stream(this.getClass().getDeclaredFields())
-            .filter(e -> e.getType().equals(TextFieldWidget.class))
+            .filter(e -> e.getType().equals(GuiTextField.class))
             .map(e -> {
                 try {
                     e.setAccessible(true);
-                    return (TextFieldWidget) e.get(this);
+                    return (GuiTextField) e.get(this);
                 } catch (IllegalAccessException illegalAccessException) {
                     throw new RuntimeException(illegalAccessException);
                 }
@@ -181,19 +178,19 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
 
     @Override
     public List<ButtonWidgetHelper<?>> getButtonWidgets() {
-        Map<ButtonWidget, ButtonWidgetHelper<?>> btns = new LinkedHashMap<>();
+        Map<GuiButton, ButtonWidgetHelper<?>> btns = new LinkedHashMap<>();
         for (RenderCommon.RenderElement el : elements) {
             if (el instanceof ButtonWidgetHelper) {
                 btns.put(((ButtonWidgetHelper<?>) el).getRaw(), (ButtonWidgetHelper<?>) el);
             }
         }
         synchronized (buttons) {
-            for (ButtonWidget e : buttons) {
+            for (GuiButton e : buttons) {
                 if (!btns.containsKey(e)) {
                     btns.put(e, new ButtonWidgetHelper<>(e));
                 }
             }
-            for (ButtonWidget e : customButtons.keySet()) {
+            for (GuiButton e : customButtons.keySet()) {
                 if (!btns.containsKey(e)) {
                     btns.put(e, new ButtonWidgetHelper<>(e));
                 }
@@ -525,7 +522,7 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
     @Override
     public ButtonWidgetHelper<?> addButton(int x, int y, int width, int height, int zIndex, String text, MethodWrapper<ButtonWidgetHelper<?>, IScreen, Object, ?> callback) {
         AtomicReference<ButtonWidgetHelper<?>> b = new AtomicReference<>(null);
-        ButtonWidget button = new ButtonWidget(-999, x, y, width, height, text);
+        GuiButton button = new GuiButton(-999, x, y, width, height, text);
         customButtons.put(button, (btn) -> {
             try {
                 callback.accept(b.get(), this);
@@ -559,7 +556,7 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
 
     @Override
     public TextFieldWidgetHelper addTextInput(int x, int y, int width, int height, int zIndex, String message, MethodWrapper<String, IScreen, Object, ?> onChange) {
-        TextFieldWidget field = new TextFieldWidget(-999, textRenderer, x, y, width, height);
+        GuiTextField field = new GuiTextField(-999, textRenderer, x, y, width, height);
         field.setText(message);
         if (onChange != null) {
             ((IGuiTextField) field).setOnChange(str -> {
@@ -771,26 +768,26 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
     @Inject(at = @At("RETURN"), method = "mouseClicked")
     public void onMouseClick(int mouseX, int mouseY, int mouseButton, CallbackInfo ci) {
         if (mouseButton == 0) {
-            for (ButtonWidget btn : customButtons.keySet()) {
+            for (GuiButton btn : customButtons.keySet()) {
                 if (btn.isMouseOver(this.client, mouseX, mouseY)) {
                     prevClickedButton = btn;
                     customButtons.get(btn).accept(btn);
                 }
             }
-            for (TextFieldWidget field : customTextFields) {
-                field.method_920(mouseX, mouseY, mouseButton);
+            for (GuiTextField field : customTextFields) {
+                field.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
     }
 
     @Override
-    public ButtonWidget getFocused() {
+    public GuiButton getFocused() {
         return prevClickedButton;
     }
 
     @Override
-    public void clickBtn(ButtonWidget btn) throws IOException {
-        ButtonWidget prev = prevClickedButton;
+    public void clickBtn(GuiButton btn) throws IOException {
+        GuiButton prev = prevClickedButton;
         if (buttons.contains(btn)) {
             prevClickedButton = btn;
             btn.playDownSound(this.client.getSoundManager());
@@ -806,9 +803,9 @@ public abstract class MixinScreen extends DrawableHelper implements IScreen, IMo
 
     //TODO: switch to enum extention with mixin 9.0 or whenever Mumfrey gets around to it
     @Inject(at = @At(value = "INVOKE",
-        target = "Lorg/apache/logging/log4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V",
+        target = "Lorg/apache/logging/log4j/Logger;error(Ljava/lang/String;)V",
         remap = false), method = "handleTextClick", cancellable = true)
-    public void handleCustomClickEvent(Text t, CallbackInfoReturnable<Boolean> cir) {
+    public void handleCustomClickEvent(IChatComponent t, CallbackInfoReturnable<Boolean> cir) {
         ClickEvent clickEvent = t.getStyle().getClickEvent();
         if (clickEvent instanceof CustomClickEvent) {
             ((CustomClickEvent) clickEvent).getEvent().run();

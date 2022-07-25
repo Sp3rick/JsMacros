@@ -1,7 +1,7 @@
 package xyz.wagyourtail.jsmacros.client.api.helpers;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import xyz.wagyourtail.jsmacros.core.MethodWrapper;
 import xyz.wagyourtail.jsmacros.core.helpers.BaseHelper;
 
@@ -13,13 +13,13 @@ import java.util.function.BiConsumer;
  * @since 1.0.8
  */
 @SuppressWarnings("unused")
-public class TextHelper extends BaseHelper<Text> {
+public class TextHelper extends BaseHelper<IChatComponent> {
     
     public TextHelper(String json) {
-        super(Text.Serializer.lenientDeserializeText(json));
+        super(IChatComponent.Serializer.deserialize(json));
     }
     
-    public TextHelper(Text t) {
+    public TextHelper(IChatComponent t) {
         super(t);
     }
     
@@ -30,7 +30,7 @@ public class TextHelper extends BaseHelper<Text> {
      * @return
      */
     public TextHelper replaceFromJson(String json) {
-        base = Text.Serializer.lenientDeserializeText(json);
+        base = IChatComponent.Serializer.deserialize(json);
         return this;
     }
     
@@ -41,7 +41,7 @@ public class TextHelper extends BaseHelper<Text> {
      * @return
      */
     public TextHelper replaceFromString(String content) {
-        base = new LiteralText(content);
+        base = new ChatComponentText(content);
         return this;
     }
     
@@ -50,7 +50,7 @@ public class TextHelper extends BaseHelper<Text> {
      * @return JSON data representation.
      */
     public String getJson() {
-        return Text.Serializer.serialize(base);
+        return IChatComponent.Serializer.serialize(base);
     }
 
     /**
@@ -77,9 +77,9 @@ public class TextHelper extends BaseHelper<Text> {
         visit_internal(base, visitor);
     }
 
-    private static void visit_internal(Text text, BiConsumer<StyleHelper, String> visitor) {
+    private static void visit_internal(IChatComponent text, BiConsumer<StyleHelper, String> visitor) {
         visitor.accept(new StyleHelper(text.getStyle()), text.asString());
-        for (Text sibling : text.getSiblings()) {
+        for (IChatComponent sibling : text.getSiblings()) {
             visit_internal(sibling, visitor);
         }
     }
