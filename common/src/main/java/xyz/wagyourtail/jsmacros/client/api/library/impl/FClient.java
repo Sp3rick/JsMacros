@@ -155,7 +155,7 @@ public class FClient extends PerExecLibrary {
             } else {
                 mc.disconnect();
             }
-            mc.setScreenAndRender(new SaveLevelScreen(new TranslatableText("selectWorld.data_read")));
+            mc.method_29970(new SaveLevelScreen(new TranslatableText("selectWorld.data_read")));
             mc.startIntegratedServer(folderName);
         });
     }

@@ -22,7 +22,6 @@
         "access.MixinMinecraftClient",
         "access.MixinPackedIntegerArray",
         "access.MixinPalettedContainer",
-        "access.MixinPalettedContainerData",
         "access.MixinPlayerEntity",
         "access.MixinPlayerListHud",
         "access.MixinRecipeBookResults",
