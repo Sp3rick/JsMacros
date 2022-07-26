@@ -12,7 +12,6 @@ import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Arm;
 import org.lwjgl.glfw.GLFW;
-import xyz.wagyourtail.jsmacros.client.mixins.access.MixinSimpleOption;
 import xyz.wagyourtail.jsmacros.core.helpers.BaseHelper;
 
 import java.util.*;
@@ -54,13 +53,13 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
     public OptionsHelper setCloudMode(int mode) {
         switch(mode) {
             case 2:
-                base.getCloudRenderMode().setValue(CloudRenderMode.FANCY);
+                base.cloudRenderMode = CloudRenderMode.FANCY;
                 return this;
             case 1:
-                base.getCloudRenderMode().setValue(CloudRenderMode.FAST);
+                base.cloudRenderMode = CloudRenderMode.FAST;
                 return this;
             default:
-                base.getCloudRenderMode().setValue(CloudRenderMode.OFF);
+                base.cloudRenderMode = CloudRenderMode.OFF;
                 return this;
         }
     }
@@ -69,7 +68,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @return
      */
     public int getGraphicsMode() {
-        switch (base.getGraphicsMode().getValue()) {
+        switch (base.graphicsMode) {
             case FABULOUS:
                 return 2;
             case FANCY:
@@ -86,13 +85,13 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
     public OptionsHelper setGraphicsMode(int mode) {
         switch(mode) {
             case 2:
-                base.getGraphicsMode().setValue(GraphicsMode.FABULOUS);
+                base.graphicsMode = GraphicsMode.FABULOUS;
                 return this;
             case 1:
-                base.getGraphicsMode().setValue(GraphicsMode.FANCY);
+                base.graphicsMode = GraphicsMode.FANCY;
                 return this;
             default:
-                base.getGraphicsMode().setValue(GraphicsMode.FAST);
+                base.graphicsMode = GraphicsMode.FAST;
                 return this;
         }
     }
@@ -146,7 +145,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @return
      */
     public boolean isRightHanded() {
-        return base.getMainArm().getValue() == Arm.RIGHT;
+        return base.mainArm == Arm.RIGHT;
     }
     
     /**
@@ -155,9 +154,9 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      */
     public void setRightHanded(boolean val) {
         if (val) {
-            base.getMainArm().setValue(Arm.RIGHT);
+            base.mainArm = Arm.RIGHT;
         } else {
-            base.getMainArm().setValue(Arm.LEFT);
+            base.mainArm = Arm.LEFT;
         }
     }
     
@@ -166,16 +165,16 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @return
      */
     public double getFov() {
-        return base.getFov().getValue();
+        return base.fov;
     }
     
     /**
      * @since 1.1.7
-     * @param fov (int since 1.7.0)
+     * @param fov
      * @return
      */
-    public OptionsHelper setFov(int fov) {
-        ((MixinSimpleOption)(Object) base.getFov()).forceSetValue(fov);
+    public OptionsHelper setFov(double fov) {
+        base.fov = fov;
         return this;
     }
     
@@ -184,7 +183,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @return
      */
     public int getRenderDistance() {
-        return base.getViewDistance().getValue();
+        return base.viewDistance;
     }
     
     /**
@@ -192,7 +191,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @param d
      */
     public void setRenderDistance(int d) {
-        ((MixinSimpleOption)(Object) base.getViewDistance()).forceSetValue(d);
+        base.viewDistance = d;
     }
     
     /**
@@ -244,7 +243,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * normal values for gamam are between {@code 0} and {@code 1}
      */
     public double getGamma() {
-        return base.getGamma().getValue();
+        return base.gamma;
     }
     
     /**
@@ -252,7 +251,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * normal values for gamma are between {@code 0} and {@code 1}
      */
     public void setGamma(double gamma) {
-        ((MixinSimpleOption)(Object) base.getGamma()).forceSetValue(gamma);
+        base.gamma = gamma;
     }
     
     /**
@@ -293,7 +292,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @param scale
      */
     public void setGuiScale(int scale) {
-        base.getGuiScale().setValue(scale);
+        base.guiScale = scale;
         mc.execute(mc::onResolutionChanged);
     }
     
@@ -302,7 +301,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @return gui scale, {@code 0} for auto.
      */
     public int getGuiScale() {
-        return base.getGuiScale().getValue();
+        return base.guiScale;
     }
     
     /**
