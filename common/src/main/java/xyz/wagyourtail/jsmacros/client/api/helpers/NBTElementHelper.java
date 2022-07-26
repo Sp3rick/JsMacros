@@ -1,9 +1,9 @@
 package xyz.wagyourtail.jsmacros.client.api.helpers;
 
-import net.minecraft.nbt.AbstractNbtList;
-import net.minecraft.nbt.AbstractNbtNumber;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.AbstractListTag;
+import net.minecraft.nbt.AbstractNumberTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import xyz.wagyourtail.jsmacros.core.helpers.BaseHelper;
 
 import java.util.Set;
@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @since 1.5.1
  */
-public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
+public class NBTElementHelper<T extends Tag> extends BaseHelper<T> {
 
     private NBTElementHelper(T base) {
         super(base);
@@ -107,26 +107,26 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
     /**
      * @since 1.5.1
      */
-    public static NBTElementHelper<?> resolve(NbtElement element) {
+    public static NBTElementHelper<?> resolve(Tag element) {
         if (element == null) return null;
         switch (element.getType()) {
-            case NbtElement.NULL_TYPE: //0
+            case 0: //Tag.NULL_TYPE
                 return new NBTElementHelper<>(element);
-            case NbtElement.BYTE_TYPE: //1
-            case NbtElement.SHORT_TYPE: //2
-            case NbtElement.INT_TYPE: //3
-            case NbtElement.LONG_TYPE: //4
-            case NbtElement.FLOAT_TYPE: //5
-            case NbtElement.DOUBLE_TYPE: //6
-                return new NBTNumberHelper((AbstractNbtNumber) element);
-            case NbtElement.BYTE_ARRAY_TYPE: //7
-            case NbtElement.LIST_TYPE: //9
-            case NbtElement.INT_ARRAY_TYPE: //11
-            case NbtElement.LONG_ARRAY_TYPE: //12
-                return new NBTListHelper((AbstractNbtList<?>) element);
-            case NbtElement.COMPOUND_TYPE: //10
-                return new NBTCompoundHelper((NbtCompound) element);
-            case NbtElement.STRING_TYPE: //8
+            case 1: //Tag.BYTE_TYPE
+            case 2: //Tag.SHORT_TYPE
+            case 3: //Tag.INT_TYPE
+            case 4: //Tag.LONG_TYPE
+            case 5: //Tag.FLOAT_TYPE
+            case 6: //Tag.DOUBLE_TYPE
+                return new NBTNumberHelper((AbstractNumberTag) element);
+            case 7: //Tag.BYTE_ARRAY_TYPE
+            case 9: //Tag.LIST_TYPE
+            case 11: //Tag.INT_ARRAY_TYPE
+            case 12: //Tag.LONG_ARRAY_TYPE
+                return new NBTListHelper((AbstractListTag<?>) element);
+            case 10: //NbtElement.COMPOUND_TYPE
+                return new NBTCompoundHelper((CompoundTag) element);
+            case 8: //NbtElement.STRING_TYPE
         }
         return new NBTElementHelper<>(element);
     }
@@ -134,9 +134,9 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
     /**
      * @since 1.5.1
      */
-    public static class NBTNumberHelper extends NBTElementHelper<AbstractNbtNumber> {
+    public static class NBTNumberHelper extends NBTElementHelper<AbstractNumberTag> {
 
-        private NBTNumberHelper(AbstractNbtNumber base) {
+        private NBTNumberHelper(AbstractNumberTag base) {
             super(base);
         }
 
@@ -145,7 +145,7 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public long asLong() {
-            return base.longValue();
+            return base.getLong();
         }
 
 
@@ -153,7 +153,7 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public int asInt() {
-            return base.intValue();
+            return base.getInt();
         }
 
 
@@ -161,7 +161,7 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public short asShort() {
-            return base.shortValue();
+            return base.getShort();
         }
 
 
@@ -169,7 +169,7 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public byte asByte() {
-            return base.byteValue();
+            return base.getByte();
         }
 
 
@@ -177,7 +177,7 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public float asFloat() {
-            return base.floatValue();
+            return base.getFloat();
         }
 
 
@@ -185,7 +185,7 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public double asDouble() {
-            return base.doubleValue();
+            return base.getDouble();
         }
 
 
@@ -193,16 +193,16 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public Number asNumber() {
-            return base.numberValue();
+            return base.getNumber();
         }
     }
 
     /**
      * @since 1.5.1
      */
-    public static class NBTListHelper extends NBTElementHelper<AbstractNbtList<?>> {
+    public static class NBTListHelper extends NBTElementHelper<AbstractListTag<?>> {
 
-        private NBTListHelper(AbstractNbtList<?> base) {
+        private NBTListHelper(AbstractListTag<?> base) {
             super(base);
         }
 
@@ -226,16 +226,16 @@ public class NBTElementHelper<T extends NbtElement> extends BaseHelper<T> {
          * @since 1.5.1
          */
         public int getHeldType() {
-            return base.getHeldType();
+            return base.getElementType();
         }
     }
 
     /**
      * @since 1.5.1
      */
-    public static class NBTCompoundHelper extends NBTElementHelper<NbtCompound> {
+    public static class NBTCompoundHelper extends NBTElementHelper<CompoundTag> {
 
-        private NBTCompoundHelper(NbtCompound base) {
+        private NBTCompoundHelper(CompoundTag base) {
             super(base);
         }
 
