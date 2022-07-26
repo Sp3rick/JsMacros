@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
 public class TextHelper extends BaseHelper<Text> {
     
     public TextHelper(String json) {
-        super(Text.Serializer.fromJson(json));
+        super(Text.Serializer.lenientDeserializeText(json));
     }
     
     public TextHelper(Text t) {
@@ -30,7 +30,7 @@ public class TextHelper extends BaseHelper<Text> {
      * @return
      */
     public TextHelper replaceFromJson(String json) {
-        base = Text.Serializer.fromJson(json);
+        base = Text.Serializer.lenientDeserializeText(json);
         return this;
     }
     
@@ -50,7 +50,7 @@ public class TextHelper extends BaseHelper<Text> {
      * @return JSON data representation.
      */
     public String getJson() {
-        return Text.Serializer.toJson(base);
+        return Text.Serializer.serialize(base);
     }
 
     /**
