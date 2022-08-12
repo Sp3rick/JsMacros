@@ -1,14 +1,16 @@
 package xyz.wagyourtail.jsmacros.client.api.helpers;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 import xyz.wagyourtail.jsmacros.core.helpers.BaseHelper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Wagyourtail
@@ -155,7 +157,7 @@ public class ItemStackHelper extends BaseHelper<ItemStack> {
      * @return
      */
     public boolean isTool() {
-        return base.getItem() instanceof ToolItem;
+        return base.getItem() instanceof ItemTool;
     }
 
     /**
@@ -163,7 +165,7 @@ public class ItemStackHelper extends BaseHelper<ItemStack> {
      * @return
      */
     public boolean isWearable() {
-        return base.getItem() instanceof ArmorItem;
+        return base.getItem() instanceof ItemArmor;
     }
 
     /**
@@ -172,7 +174,7 @@ public class ItemStackHelper extends BaseHelper<ItemStack> {
      */
     public int getMiningLevel() {
         if (isTool()) {
-            return Item.ToolMaterialType.valueOf(((ToolItem) base.getItem()).getMaterialAsString()).getMiningLevel();
+            return Item.ToolMaterial.valueOf(((ItemTool) base.getItem()).getMaterialAsString()).getMiningLevel();
         } else {
             return 0;
         }

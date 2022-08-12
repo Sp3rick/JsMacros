@@ -91,11 +91,6 @@ public class MixinClientPlayNetworkHandler {
         }
     }
 
-    @Inject(at = @At("TAIL"), method = "onCommandSuggestions", locals = LocalCapture.CAPTURE_FAILHARD)
-    public void onOnCommandSuggestions(CommandSuggestionsS2CPacket packet, CallbackInfo ci, String[] suggestions) {
-        CommandManager.instance.pathNodeMaker.method_12185(suggestions);
-    }
-
     @Inject(method = "onDisconnected", at = @At("HEAD"))
     public void onDisconnected(IChatComponent p_onDisconnected_1_, CallbackInfo ci) {
         new EventDisconnect(p_onDisconnected_1_);

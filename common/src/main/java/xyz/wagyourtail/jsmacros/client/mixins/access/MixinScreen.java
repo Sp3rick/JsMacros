@@ -645,7 +645,7 @@ public abstract class MixinScreen extends Gui implements IScreen, IMouseScrolled
 
     @Override
     public IScreen reloadScreen() {
-        client.execute(() -> client.openScreen((Screen) (Object) this));
+        client.execute(() -> client.openScreen((GuiScreen) (Object) this));
         return this;
     }
 
