@@ -36,7 +36,7 @@ public class OptionsHelper extends BaseHelper<GameOptions> {
      * @return 0: off, 2: fancy
      */
     public int getCloudMode() {
-        switch (base.getCloudRenderMode().getValue()) {
+        switch (base.getCloudRenderMode()) {
             case FANCY:
                 return 2;
             case FAST:
