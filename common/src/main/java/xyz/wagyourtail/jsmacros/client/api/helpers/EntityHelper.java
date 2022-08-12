@@ -211,7 +211,7 @@ public class EntityHelper<T extends Entity> extends BaseHelper<T> {
      * @return glow color
      */
     public int getGlowingColor() {
-        return base.getTeamColorValue();
+        return ((IMixinEntity) base).jsmacros_getGlowingColor();
     }
 
     /**
