@@ -57,6 +57,7 @@ processResources {
 
     filesMatching("META-INF/mods.toml") {
         expand "version": project.version
+
     }
 
     filesMatching("jsmacros.extension.json") {
@@ -96,7 +97,7 @@ jar {
     manifest {
         attributes([
                 'MixinConnector': 'xyz.wagyourtail.jsmacros.forge.client.JsMacrosEarlyRiser',
-                'JsMacrosDeps': configurations.include.files.collect { it.name }.join(" ")
+                'JsMacrosDeps': configurations.include2.files.collect { it.name }.join(" ")
         ])
     }
 }
